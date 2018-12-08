@@ -1,0 +1,104 @@
+---
+title: "O Canada"
+description: Quick and dirty Canadian map example
+author:
+  - name: Kieran Healy
+    url: http://kieranhealy.org
+    affiliation: Duke University 
+    affiliation_url: http://duke.edu
+date: "`r Sys.Date()`"
+output: radix::radix_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(geojsonio)
+library(rmapshaper)
+library(rgdal)
+library(tidyverse)
+library(broom)
+library(socviz)
+
+## Map theme
+theme_map <- function(base_size=9, base_family="") {
+    require(grid)
+    theme_bw(base_size=base_size, base_family=base_family) %+replace%
+        theme(axis.line=element_blank(),
+              axis.text=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid=element_blank(),
+              panel.spacing=unit(0, "lines"),
+              plot.background=element_blank(),
+              legend.justification = c(0,0),
+              legend.position = c(0,0)
+              )
+}
+
+theme_set(theme_map())
+
+```
+
+ Get data from Statistics Canada: http://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2011-eng.cfm. It is a zipped archive containin an ArcGIS .shp file for Census divisions and cartographic boundaries. Expand the zip file into a directory in your working folder named 'data'. Then mport the shapefile into R as SpatialPolygon Dataframe.
+
+
+```{r}
+canada_raw <- readOGR(dsn = "data/gcd_000b11a_e", layer = "gcd_000b11a_e",
+                      use_iconv=TRUE, encoding="CP1250")
+```
+
+Convert it to GeoJSON format and simplify the polygons.
+
+```{r}
+canada_raw_json <- geojson_json(canada_raw)
+canada_raw_sim <- ms_simplify(canada_raw_json)
+```
+
+Save the resulting GeoJSON file, which you can work with directly from here on
+
+```{r}
+geojson_write(canada_raw_sim, file = "data/canada_cd_sim.geojson")
+```
+
+Read the file back in:
+
+```{r}
+canada_gj<- readOGR(dsn = "data/canada_cd_sim.geojson", layer="OGRGeoJSON")
+```
+
+Transform the coordinates to a Lambert Conformal Conic Projection. (See  https://www.statcan.gc.ca/pub/92-195-x/2011001/other-autre/mapproj-projcarte/m-c-eng.htm).
+
+```{r}
+canada_gj <- spTransform(canada_gj, CRS("+proj=lcc +lat_1=49 +lat_2=77 +lon_0=-91.52 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
+```
+
+Convert to a tidy data frame. (Would now be much preferable to do this with simple features, `sf` library, I think.)
+
+```{r}
+canada_cd <- tidy(canada_sim_gj2)
+```
+
+Make a vector of repeated colors---just to fill in the map, for decoration only, as I don't have any Canadian data to merge in.
+
+```{r}
+
+map_colors <-  RColorBrewer::brewer.pal(8, "Pastel1")
+map_colors <- rep(map_colors, 37)
+
+
+## Draw the map
+p + geom_polygon(mapping = aes(fill = id),
+                 color="gray60",
+                 size=0.2) +
+    scale_fill_manual(values = map_colors) +
+    guides(fill = FALSE)
+
+```
+
+
+
+
+
