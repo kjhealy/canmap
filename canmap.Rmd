@@ -10,6 +10,8 @@ date: "`r Sys.Date()`"
 output: radix::radix_article
 ---
 
+## Required Libraries, and a Map Theme
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 
@@ -17,6 +19,8 @@ library(geojsonio)
 library(rmapshaper)
 library(rgdal)
 library(tidyverse)
+library(spdplyr)
+library(sf)
 library(broom)
 library(socviz)
 
@@ -40,9 +44,14 @@ theme_map <- function(base_size=9, base_family="") {
 
 theme_set(theme_map())
 
+## Make a "figures" directory if one doesn't exist
+ifelse(!dir.exists(file.path("figures")), dir.create(file.path("figures")), FALSE)
+
 ```
 
- Get data from Statistics Canada: http://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2011-eng.cfm. It is a zipped archive containin an ArcGIS .shp file for Census divisions and cartographic boundaries. Expand the zip file into a directory in your working folder named 'data'. Then mport the shapefile into R as SpatialPolygon Dataframe.
+## Downloading and converting the map files for the first time
+
+ Get data from Statistics Canada: http://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2011-eng.cfm. It is a zipped archive containin an ArcGIS .shp file for Census divisions and cartographic boundaries. Expand the zip file into a directory in your working folder named 'data'. Then import the shapefile into R as SpatialPolygon Dataframe.
 
 
 ```{r}
@@ -50,7 +59,7 @@ canada_raw <- readOGR(dsn = "data/gcd_000b11a_e", layer = "gcd_000b11a_e",
                       use_iconv=TRUE, encoding="CP1250")
 ```
 
-Convert it to GeoJSON format and simplify the polygons.
+Convert it to GeoJSON format and simplify the polygons. These steps will take a little while.
 
 ```{r}
 canada_raw_json <- geojson_json(canada_raw)
@@ -63,23 +72,20 @@ Save the resulting GeoJSON file, which you can work with directly from here on
 geojson_write(canada_raw_sim, file = "data/canada_cd_sim.geojson")
 ```
 
-Read the file back in:
+## Working with the GeoJSON file in the tidyverse
+
+Read the GeoJSON file back in as an `sf` object.
 
 ```{r}
-canada_gj<- readOGR(dsn = "data/canada_cd_sim.geojson", layer="OGRGeoJSON")
+canada_cd <-st_read("data/canada_cd_sim.geojson", quiet = TRUE)
 ```
 
 Transform the coordinates to a Lambert Conformal Conic Projection. (See  https://www.statcan.gc.ca/pub/92-195-x/2011001/other-autre/mapproj-projcarte/m-c-eng.htm).
 
 ```{r}
-canada_gj <- spTransform(canada_gj, CRS("+proj=lcc +lat_1=49 +lat_2=77 +lon_0=-91.52 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"))
+canada_cd <- st_transform(canada_cd, crs = "+proj=lcc +lat_1=49 +lat_2=77 +lon_0=-91.52 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs")
 ```
 
-Convert to a tidy data frame. (Would now be much preferable to do this with simple features, `sf` library, I think.)
-
-```{r}
-canada_cd <- tidy(canada_sim_gj2)
-```
 
 Make a vector of repeated colors---just to fill in the map, for decoration only, as I don't have any Canadian data to merge in.
 
@@ -90,11 +96,17 @@ map_colors <- rep(map_colors, 37)
 
 
 ## Draw the map
-p + geom_polygon(mapping = aes(fill = id),
-                 color="gray60",
-                 size=0.2) +
-    scale_fill_manual(values = map_colors) +
-    guides(fill = FALSE)
+p <- ggplot(data = canada_cd, 
+            mapping = aes(fill = PRUID))
+p_out <- p + geom_sf(color = "gray60", 
+                    size = 0.1) + 
+  scale_fill_manual(values = map_colors) + 
+  guides(fill = FALSE) + 
+  theme_map() + 
+  theme(panel.grid.major = element_line(color = "white"),
+        legend.key = element_rect(color = "gray40", size = 0.1))
+
+ggsave("figures/canada.pdf", p_out, height = 12, width = 15)
 
 ```
 
