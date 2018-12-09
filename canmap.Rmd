@@ -77,7 +77,7 @@ geojson_write(canada_raw_sim, file = "data/canada_cd_sim.geojson")
 Read the GeoJSON file back in as an `sf` object.
 
 ```{r}
-canada_cd <-st_read("data/canada_cd_sim.geojson", quiet = TRUE)
+canada_cd <- st_read("data/canada_cd_sim.geojson", quiet = TRUE)
 ```
 
 Transform the coordinates to a Lambert Conformal Conic Projection. (See  https://www.statcan.gc.ca/pub/92-195-x/2011001/other-autre/mapproj-projcarte/m-c-eng.htm).
@@ -87,7 +87,7 @@ canada_cd <- st_transform(canada_cd, crs = "+proj=lcc +lat_1=49 +lat_2=77 +lon_0
 ```
 
 
-Make a vector of repeated colors---just to fill in the map, for decoration only, as I don't have any Canadian data to merge in.
+Make a vector of repeated colors---just to fill in the map, for decoration only, as I don't have any Canadian data to merge in at present.
 
 ```{r}
 
