@@ -13,7 +13,7 @@ output: radix::radix_article
 ## Required Libraries, and a Map Theme
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 
 library(geojsonio)
 library(rmapshaper)
@@ -51,24 +51,24 @@ ifelse(!dir.exists(file.path("figures")), dir.create(file.path("figures")), FALS
 
 ## Downloading and converting the map files for the first time
 
-You won't be able to run the code in this section until you have some raw shapefiles to work with. Get data from Statistics Canada: http://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2011-eng.cfm. From the linked page, choose as your options _ArcGIS .shp file_, then---for example---_Census divisions_ and _cartographic boundaries_. You'll then download a zip file. Expand this zip file into a directory in your working folder named 'data'. Then import the shapefile as below.
+You won't be able to run the code in this section until you have some raw shapefiles to work with. Get data from Statistics Canada: http://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2011-eng.cfm. From the linked page, choose as your options _ArcGIS .shp file_, then---for example---_Census divisions_ and _cartographic boundaries_. You'll then download a zip file. Expand this zip file into a directory in your working folder named 'data'. Then import the shapefile as below. The `EVAL` option is set to `FALSE` on the chunks in this section, so they will not be evaluated if you run the document. (R will just skip to the next section below, instead.) To evaluate them, download the data as just described, and then remove the `eval = FALSE` option from each chunk.
 
 
-```{r}
+```{r, eval = FALSE}
 canada_raw <- readOGR(dsn = "data/gcd_000b11a_e", layer = "gcd_000b11a_e",
                       use_iconv=TRUE, encoding="CP1250")
 ```
 
 Convert it to GeoJSON format and simplify the polygons. These steps will take a little while.
 
-```{r}
+```{r, eval = FALSE}
 canada_raw_json <- geojson_json(canada_raw)
 canada_raw_sim <- ms_simplify(canada_raw_json)
 ```
 
 Save the resulting GeoJSON file, which you can work with directly from here on
 
-```{r}
+```{r, eval = FALSE}
 geojson_write(canada_raw_sim, file = "data/canada_cd_sim.geojson")
 ```
 
@@ -93,7 +93,7 @@ canada_cd
 
 Make a vector of repeated colors---just to fill in the map, for decoration only, as I don't have any Canadian data to merge in at present.
 
-```{r}
+```{r, layout = 'l-screen-inset'}
 
 map_colors <-  RColorBrewer::brewer.pal(8, "Pastel1")
 map_colors <- rep(map_colors, 37)
@@ -112,6 +112,7 @@ p_out <- p + geom_sf(color = "gray60",
 
 ggsave("figures/canada.pdf", p_out, height = 12, width = 15)
 
+p_out
 ```
 
 
