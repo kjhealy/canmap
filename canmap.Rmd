@@ -32,7 +32,6 @@ library(rgdal)
 library(tidyverse)
 library(spdplyr)
 library(sf)
-library(broom)
 library(socviz)
 
 ## Map theme
@@ -54,10 +53,11 @@ theme_map <- function(base_size=9, base_family="") {
 }
 
 theme_set(theme_map())
+```
 
+```{r figdir, echo = FALSE, results = 'hide'}
 ## Make a "figures" directory if one doesn't exist
 ifelse(!dir.exists(file.path("figures")), dir.create(file.path("figures")), FALSE)
-
 ```
 
 ## Downloading and converting the map files for the first time
