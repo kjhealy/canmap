@@ -51,7 +51,7 @@ ifelse(!dir.exists(file.path("figures")), dir.create(file.path("figures")), FALS
 
 ## Downloading and converting the map files for the first time
 
- Get data from Statistics Canada: http://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2011-eng.cfm. It is a zipped archive containin an ArcGIS .shp file for Census divisions and cartographic boundaries. Expand the zip file into a directory in your working folder named 'data'. Then import the shapefile into R as SpatialPolygon Dataframe.
+ Get data from Statistics Canada: http://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2011-eng.cfm. From the linked page, choose as your options _ArcGIS .shp file_, then---for example---_Census divisions_ and _cartographic boundaries_. You'll then download a zip file. Expand this zip file into a directory in your working folder named 'data'. Then import the shapefile as below.
 
 
 ```{r}
