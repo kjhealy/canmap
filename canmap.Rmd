@@ -12,7 +12,18 @@ output: radix::radix_article
 
 ## Required Libraries, and a Map Theme
 
-```{r setup, include=FALSE}
+Mapping data (and, more importantly, converting map data into a format that we can tidily use) requires a bit more heavy lifting behind the scenes than the core `tidyverse` libraries provide. Start by installing the `sf` library, which will also bring a number of dependencies with it.
+
+```{r installation, eval = FALSE, echo = TRUE}
+install.packages("sf")
+install.packages("rgdal")
+install.packages("geojsonio")
+install.packages("spdplyr")
+install.packages("rmapshaper")
+
+```
+
+```{r setup}
 knitr::opts_chunk$set(echo = TRUE)
 
 library(geojsonio)

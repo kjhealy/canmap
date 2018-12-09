@@ -1960,6 +1960,19 @@ distill-header .nav a {
 
 <div class="d-article">
 <h2 id="required-libraries-and-a-map-theme">Required Libraries, and a Map Theme</h2>
+<p>Mapping data (and, more importantly, converting map data into a format that we can tidily use) requires a bit more heavy lifting behind the scenes than the core <code>tidyverse</code> libraries provide. Start by installing the <code>sf</code> library, which will also bring a number of dependencies with it.</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+install.packages(&quot;sf&quot;)
+install.packages(&quot;rgdal&quot;)
+install.packages(&quot;geojsonio&quot;)
+install.packages(&quot;spdplyr&quot;)
+install.packages(&quot;rmapshaper&quot;)</code></pre>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<pre><code>
+[1] FALSE</code></pre>
+</div>
 <h2 id="downloading-and-converting-the-map-files-for-the-first-time">Downloading and converting the map files for the first time</h2>
 <p>You won’t be able to run the code in this section until you have some raw shapefiles to work with. Get data from Statistics Canada: <a href="http://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2011-eng.cfm" class="uri">http://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2011-eng.cfm</a>. From the linked page, choose as your options <em>ArcGIS .shp file</em>, then—for example—<em>Census divisions</em> and <em>cartographic boundaries</em>. You’ll then download a zip file. Expand this zip file into a directory in your working folder named ‘data’. Then import the shapefile as below. The <code>EVAL</code> option is set to <code>FALSE</code> on the chunks in this section, so they will not be evaluated if you run the document. (R will just skip to the next section below, instead.) To evaluate them, download the data as just described, and then remove the <code>eval = FALSE</code> option from each chunk.</p>
 <div class="layout-chunk" data-layout="l-body">
