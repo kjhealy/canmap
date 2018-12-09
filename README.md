@@ -6,3 +6,6 @@ Classroom example. Downloading a map of Canada (with Census district boundaries)
 GeoJSON format, and then using as a simple features (`sf`) object. 
 
 ![Canada](figures/canada.png)
+
+
+Learn more at <http://socviz.co>.
